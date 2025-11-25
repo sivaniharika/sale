@@ -4091,8 +4091,43 @@ Requirements:
  • order_date (for filtering by year) • customer_id • registered_dateckout but no payment), is_valid is 0, and is_net is 0, for the year 2022.
 */
 
-select 
+select distinct customerdet.id, customerdet.registered_date
+from  customer_detail as customerdet  join order_detail as ordet
+where Year(order_date)=2022 and is_gross=1 and is_valid =0 and is_net=0
+group by  customerdet.id , customerdet.registered_date
+;
 
+/*Question 4
+Comparing Weekend and Weekday Sales in Q4 2022 Scenario: 
+The Campaign Team wants to evaluate the effectiveness of their weekend promotional campaigns (Saturdays and Sundays)
+ between October and December 2022 by comparing the average daily sales during weekends vs weekdays.
+ Requirements: 1. Calculate the average daily sales (before_discount) for weekends (Saturdays and Sundays) and weekdays (Monday to Friday) 
+ for each month (October, November, and December 2022).
+ 2. Calculate the average sales for weekends vs weekdays for the entire three-month period. 
+ 3. Share insights on whether sales increased during weekends.
+ Key Features to Use: • order_date (for filtering by date and identifying days of the week)
+ • before_discount (for sales data) • month_id, month_name, day_name, year (for extracting date-related information)
+*/
+
+
+with final_table as
+(
+select 
+  DATE_FORMAT(order_date, '%m') AS Month_id,
+DATE_FORMAT(order_date, '%M') AS Month_Name,
+ DATE_FORMAT(order_date, '%Y') AS Year,
+round( avg(case when DAYNAME(order_date) IN ('Saturday', 'Sunday') then ordet.before_discount end),2) as AvgSales_Weekend,
+round(avg(case when DAYNAME(order_date) IN ('Monday', 'Tuesday','Wednesday','Thrsday','Friday') then ordet.before_discount end),2) as AvgSales_Weekday
+from order_detail as ordet
+where  DATE_FORMAT(order_date, '%M') in ('October','November','December') and Year(order_date)=2022
+group by Month_id, Month_Name, Year
+order by Month_id
+)
+
+select 'Total 3 months' AS Total_period , sum(AvgSales_Weekend) as Total_AvgSales_Weekend ,sum(AvgSales_Weekday) as Total_AvgSales_Weekday,
+(sum(AvgSales_Weekend)- sum(AvgSales_Weekday)) as Sales_Diff,
+round(( (sum(AvgSales_Weekend)- sum(AvgSales_Weekday) )/ sum(AvgSales_Weekend)) *100,2) as Percentage_Diff
+ from final_table;
 
 
 
@@ -4137,10 +4172,10 @@ Requirements: 1. Aggregate the sales data by category for 2022.
  
  select Year(order_date) as Year,skudet.category as Category,
  sum(case when extract(year from ordet.order_date)=2022 then ordet.qty_ordered end) as Sales
- 
  from order_detail as ordet inner join sku_detail as skudet
  where is_valid =1 
  group by Category, Year
  order by Sales desc;
+
 
 
