@@ -1,4 +1,4 @@
-**Project Title : **
+Project Title : 
 Advanced  Sales Analytics using Google Looker Studio
 
 Project Description:
@@ -58,5 +58,3 @@ This comparison helps understand which categories drove overall business perform
 
 Impact:
 The project empowers stakeholders with actionable insights and interactive visualizations, supporting strategic decisions in marketing, sales, and customer management. Google Looker Studio dashboards make the data easily accessible and interpretable, fostering data-driven strategies for better business outcomes.
-
-
